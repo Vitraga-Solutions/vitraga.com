@@ -15,9 +15,7 @@ const logos = [
 const links = [
   { name: "About us", href: "#about" },
   { name: "Services", href: "#services" },
-  { name: "Use Cases", href: "#cases" },
-  { name: "Pricing", href: "#Testimonials" },
-  { name: "Blog", href: "#Home" },
+  { name: "Blog", href: "/articles" },
 ];
 ---
 
@@ -32,7 +30,7 @@ const links = [
         >
           <picture>
             <a href="#home">
-              <Image src={Logo} alt="Logo for Kreatif Brand" />
+              <Image src={Logo} alt="Logo for Kreatif Brand" class={"h-14 w-auto"} />
             </a>
           </picture>
           <ul class="flex flex-col sm:flex-row gap-5">
@@ -69,12 +67,14 @@ const links = [
           <div
             class="flex text-center lg:text-start flex-col w-full lg:w-[30%]"
           >
-            <h3 class="mb-5 text-center md:text-left text-2xl text-green">Contact us</h3>
+            <h3 class="mb-5 text-center md:text-left text-2xl text-green">
+              Contact us
+            </h3>
             <div class="flex flex-col justify-between gap-4">
-              <span> Email: examplemail.com </span>
-              <span> Phone: +123 456 789 </span>
+              <span> Email: contact@vitraga.com </span>
+              <span> Phone: +91 9359149731 </span>
               <span class="lg:w-3/4">
-                Address: 1234 Street Name, City Name, Country Name
+                Address: Mumbai, India.
               </span>
             </div>
           </div>
@@ -89,35 +89,15 @@ const links = [
         class="flex flex-col lg:flex-row h-20 justify-center mt-4 text-center md:justify-between md:mt-0"
       >
         <span
-          >2024 Positivus - Made With <a
+          >2024 Vitraga - Made With <a
             class="underline"
             target="_blank"
             href="https://astro.build">Astro</a
-          > by 
-          <a 
-          class="underline"
-          target="_blank"
-          href="https://manulthanura.com">Manul</a
-          ></span
-        >&nbsp
-        <span>
-          Credits (
-          <a
-            href="https://www.olgaskuja.design/"
-            target="_blank"
-            class="underline">Olga</a
-          >,
-          <a
-            href="https://esteban-vasquez.netlify.app/"
-            target="_blank"
-            class="underline">Esteban</a
-          >)
-          <span> &</span>
-          <a
-            class="underline"
-            href="https://creativecommons.org/licenses/by/4.0/"
-            target="_blank">Licence</a
           >
+        </span>
+        &nbsp
+        <span>
+          All Rights Reserved.
         </span>
       </div>
     </div>
