@@ -37,7 +37,7 @@ const { index, titleTop, titleBottom, img, alt, link } = Astro.props;
     </picture>
     <div class="flex items-end">
       <a href={link} class="flex items-center gap-3.5"
-        ><Image src={index === 1 || index === 2 ? gob : wob} alt={alt} />
+        ><Image src={index === 1 || index === 2 ? gob : wob} alt={alt} class={'hover:scale-110 duration-300'} />
         <span class="hidden sm:block">Service Info</span></a
       >
     </div>
