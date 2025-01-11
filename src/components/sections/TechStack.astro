@@ -1,0 +1,23 @@
+---
+import { Image } from "astro:assets";
+import Logo from "@/utils/logo";
+import Section from "./Section.astro";
+
+const { stack } = Astro.props;
+---
+
+<Section id="sponsors">
+  <div class="flex-row items-center">
+    <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 justify-items-center place-content-center">
+      {
+        stack.map((name : string) => {
+          return (
+            <div class="p-4 grayscale transition duration-200 hover:grayscale-0">
+              <Image src={ Logo[name].src } class="h-12 w-auto mx-auto" alt={Logo[name].alt} loading="lazy" />
+            </div>
+          );
+        })
+      }
+    </div>
+  </div> 
+</Section>
