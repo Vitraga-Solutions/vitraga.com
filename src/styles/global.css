@@ -163,3 +163,7 @@
   font-size: 1.4rem;
   font-weight: bold;
 }
+
+pre.astro-code {
+  padding: 2rem;
+}
