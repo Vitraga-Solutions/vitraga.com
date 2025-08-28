@@ -1,73 +1,88 @@
 ---
-import { Image } from "astro:assets";
+import { supabase } from "../../lib/supabase";
 import decorForm from "../../assets/pics/contact-pic.png";
+
+// Server-side form handling
+let message = "";
+let messageType = "";
+
+async function handleForm() {
+  if (Astro.request.method === "POST") {
+    try {
+      const data = await Astro.request.formData();
+      const name = data.get("name");
+      const email = data.get("email");
+      const messageText = data.get("message");
+      const sayHi = data.get("checkbox1") === "on";
+      const getQuote = data.get("checkbox2") === "on";
+
+      if (!name || !email || !messageText) {
+        throw new Error("Please fill in all required fields.");
+      }
+
+      const { error } = await supabase
+        .from("contacts")
+        .insert([
+          { name, email, message: messageText, say_hi: sayHi, get_quote: getQuote }
+        ]);
+
+      if (error) throw error;
+
+      message = "Thank you for your message! We'll get back to you soon.";
+      messageType = "success";
+    } catch (error) {
+      console.error(error);
+      message = error.message || "Sorry, something went wrong. Please try again.";
+      messageType = "error";
+    }
+  }
+}
+
+await handleForm();
 ---
 
-<div
-  class="flex relative justify-start items-center p-[60px] bg-[#F3F3F3] rounded-[45px] overflow-hidden"
->
-  <form class="bg-gray sm:p-6 h-full w-full lg:max-w-lg">
+<div class="flex relative justify-start items-center p-[60px] bg-[#F3F3F3] rounded-[45px] overflow-hidden">
+  {message && (
+    <div class={`absolute top-4 left-4 right-4 p-4 rounded-lg ${messageType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+      {message}
+    </div>
+  )}
+
+  <form method="POST" class="bg-gray sm:p-6 h-full w-full lg:max-w-lg" id="contactForm">
     <div class="flex flex-col sm:flex-row gap-[35px] sm:items-center mb-10">
       <div class="flex items-center gap-[14px]">
-        <input
-          type="checkbox"
-          id="checkbox1"
-          name="checkbox1"
-          class="form-checkbox text-black"
-        />
+        <input type="checkbox" id="checkbox1" name="checkbox1" class="form-checkbox text-black" />
         <label for="checkbox1" class="text-black">Say Hi</label>
       </div>
       <div class="flex items-center gap-[14px]">
-        <input
-          type="checkbox"
-          id="checkbox2"
-          name="checkbox2"
-          class="form-checkbox text-black"
-        />
-        <label for="checkbox2" class="flex items-center text-black"
-          >Get a Quote</label
-        >
+        <input type="checkbox" id="checkbox2" name="checkbox2" class="form-checkbox text-black" />
+        <label for="checkbox2" class="flex items-center text-black">Get a Quote</label>
       </div>
     </div>
 
     <div class="mb-4">
       <label for="name" class="block text-black mb-2">Name*</label>
-      <input
-        type="text"
-        id="name"
-        name="name"
-        placeholder="Name"
-        class="w-full px-[30px] py-[18px] border border-black rounded-[14px] text-black outline-none"
-      />
+      <input type="text" id="name" name="name" placeholder="Name" required class="w-full px-[30px] py-[18px] border border-black rounded-[14px] text-black outline-none" />
     </div>
 
     <div class="mb-4">
       <label for="email" class="block text-black mb-2">Email*</label>
-      <input
-        type="email"
-        id="email"
-        name="email"
-        placeholder="Email"
-        class="w-full px-[30px] py-[18px] border border-black rounded-[14px] text-black outline-none"
-      />
+      <input type="email" id="email" name="email" placeholder="Email" required class="w-full px-[30px] py-[18px] border border-black rounded-[14px] text-black outline-none" />
     </div>
 
     <div class="mb-4">
       <label for="message" class="block text-black mb-2">Message*</label>
-      <textarea
-        id="message"
-        name="message"
-        placeholder="Message"
-        class="w-full px-[30px] py-[18px] border border-black rounded-[14px] text-black outline-none"
-      ></textarea>
+      <textarea id="message" name="message" placeholder="Message" required class="w-full px-[30px] py-[18px] border border-black rounded-[14px] text-black outline-none"></textarea>
     </div>
 
-    <button type="submit" name="submit" class="btn-primary w-full">Send</button>
+    <button type="submit" class="btn-primary w-full" id="submitButton">Send</button>
   </form>
+
   <picture class="absolute right-[-25%] top-[2%] bottom-[2%] hidden lg:block">
-    <Image src={decorForm} alt="decor" />
+    <img src={decorForm} alt="decor" class="w-full h-auto" />
   </picture>
 </div>
+
 <style>
   .form-checkbox {
     appearance: none;
@@ -97,34 +112,70 @@ import decorForm from "../../assets/pics/contact-pic.png";
   .form-checkbox:checked:before {
     transform: scale(0.6);
   }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 </style>
+
 <script>
   function formSetup() {
-    var cb1 = document.getElementById("checkbox1") as HTMLInputElement;
-    var cb2 = document.getElementById("checkbox2") as HTMLInputElement;
-    var message = document.getElementById("message") as HTMLInputElement;
+    const cb1 = document.getElementById("checkbox1");
+    const cb2 = document.getElementById("checkbox2");
+    const message = document.getElementById("message");
+    const form = document.getElementById("contactForm");
+    const submitButton = document.getElementById("submitButton");
 
     if (cb1 && cb2) {
       cb1.checked = true;
 
-      cb2.addEventListener("change", function () {
+      cb2.addEventListener("change", () => {
         if (cb2.checked) {
           cb1.checked = false;
-          message.value =
-            "We're interested in your services! Please contact us";
+          message.value = "We're interested in your services! Please contact us.";
         } else {
           message.value = "";
           cb1.checked = true;
         }
       });
-      cb1.addEventListener("change", function () {
+
+      cb1.addEventListener("change", () => {
         if (cb1.checked) {
           cb2.checked = false;
           message.value = "";
         } else {
           cb2.checked = true;
-          message.value =
-            "We're interested in your services! Please contact us";
+          message.value = "We're interested in your services! Please contact us.";
+        }
+      });
+    }
+
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        submitButton.disabled = true;
+        submitButton.textContent = "Sending...";
+
+        try {
+          const formData = new FormData(form);
+          const response = await fetch(window.location.href, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (response.ok) {
+            form.reset();
+            window.location.href = window.location.href; // Reload to show message
+          } else {
+            throw new Error("Form submission failed.");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Sorry, something went wrong. Please try again.");
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = "Send";
         }
       });
     }
