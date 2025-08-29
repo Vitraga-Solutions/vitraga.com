@@ -1,13 +1,31 @@
 ---
 import MainLayout from "../../layouts/MainLayout.astro";
 import Section from "../../components/sections/Section.astro";
+import ErrorPage from "../../components/ui/ErrorPage.astro";
 import { marked } from 'marked';
-import { jobs } from "../../data/jobsData.js";
+import { getJobById } from "../../lib/supabase";
 
 const { id } = Astro.params;
-const jobId = id;
+const jobId = parseInt(id as string);
 
-const job = jobs.find((j) => j.id.toString() === jobId);
+if (!jobId || isNaN(jobId)) {
+  return Astro.redirect('/careers');
+}
+
+let job;
+let error = false;
+
+try {
+  job = await getJobById(jobId);
+} catch (err) {
+  console.error('Error fetching job:', err);
+  error = true;
+}
+
+if (error) {
+  // Show error page
+  return;
+}
 
 if (!job) {
   return Astro.redirect('/careers');
@@ -18,9 +36,17 @@ marked.setOptions({
   gfm: true,
 });
 
-const htmlDescription = await marked(job.description);
-console.log(htmlDescription);
+const htmlDescription = await marked(job.description || '');
 ---
+
+{error ? (
+  <MainLayout title="Error - Job Not Found" description="Unable to load job details">
+    <ErrorPage 
+      title="Unable to Load Job"
+      message="We're having trouble loading this job posting. Please try again later or browse other opportunities."
+    />
+  </MainLayout>
+) : (
 
 <MainLayout title={`${job.title} - Careers`} description={`Apply for ${job.title} position at our company.`}>
   <Section>
@@ -97,8 +123,9 @@ console.log(htmlDescription);
     </div>
   </Section>
 </MainLayout>
+)}
 
-<script define:vars={{ jobFields: job.fields }}>
+<script define:vars={{ jobFields: job?.fields || [] }}>
   document.addEventListener('DOMContentLoaded', () => {
     const dynamicFields = document.getElementById('dynamic-form-fields');
     const form = document.getElementById('job-application-form');
@@ -116,28 +143,46 @@ console.log(htmlDescription);
     
     // Handle form submission
     if (form) {
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const formData = new FormData(form);
-        const data = {};
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
         
-        for (let [key, value] of formData.entries()) {
-          if (data[key]) {
-            if (Array.isArray(data[key])) {
-              data[key].push(value);
-            } else {
-              data[key] = [data[key], value];
-            }
+        // Show loading state
+        submitButton.textContent = 'Submitting...';
+        submitButton.disabled = true;
+        
+        try {
+          const formData = new FormData(form);
+          
+          const response = await fetch('/api/apply', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            alert('Application submitted successfully! We will get back to you soon.');
+            form.reset();
           } else {
-            data[key] = value;
+            let errorMessage = 'Error submitting application: ';
+            if (result.details && Array.isArray(result.details)) {
+              errorMessage += result.details.join(', ');
+            } else {
+              errorMessage += (result.error || 'Unknown error');
+            }
+            alert(errorMessage);
           }
+        } catch (error) {
+          console.error('Error submitting application:', error);
+          alert('Error submitting application. Please try again.');
+        } finally {
+          // Reset button state
+          submitButton.textContent = originalButtonText;
+          submitButton.disabled = false;
         }
-        
-        console.log('Application data:', data);
-        
-        // Here you would send to your API
-        alert('Application submitted successfully! We will get back to you soon.');
       });
     }
   });

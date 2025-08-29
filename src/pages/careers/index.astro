@@ -2,10 +2,10 @@
 import Section from "../../components/sections/Section.astro";
 import JobCard from "../../components/ui/JobCard.astro";
 import SectionTitle from "../../components/ui/SectionTitle.astro";
-import { jobs } from "../../data/jobsData.js";
 import MainLayout from "../../layouts/MainLayout.astro";
+import { getActiveJobs } from "../../lib/supabase";
 
-const activeJobs = jobs.filter(job => job.is_active);
+const activeJobs = await getActiveJobs();
 ---
 
 <MainLayout title="Careers - Join Our Team" description="Explore exciting career opportunities and join our innovative team.">
