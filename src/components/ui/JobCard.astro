@@ -13,12 +13,40 @@ const htmlDescription = await marked(job.description);
 const previewDescription = htmlDescription.split('---')[0];
 ---
 
-<div class="bg-white border border-gray-200 rounded-[24px] p-8 shadow-sm hover:shadow-md transition-shadow duration-200">
-  <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-    <!-- Job Info -->
-    <div class="flex-1">
-      <h3 class="text-2xl font-medium text-black mb-4">{job.title}</h3>
-      
+<div
+  id={`job-accordion-${job.id}`}
+  class="job-accordion-item group h-[160px] bg-[#F3F3F3] overflow-hidden w-full transition-all duration-500 mb-[30px] rounded-[45px] border border-dark shadow-[0px_5px_0px_#191a23]"
+>
+  <button
+    class="job-accordion-toggle w-full h-[160px] flex items-center justify-between p-[60px] cursor-pointer"
+    id={`job-${job.id}-accordion-button`}
+    aria-expanded="false"
+    aria-controls={`job-${job.id}-accordion-content`}
+  >
+    <div class="flex items-center gap-[25px]">
+      <span class="hidden sm:block sm:text-6xl">{String(job.id).length < 2 ? `0${job.id}` : job.id}</span>
+      <div class="text-left">
+        <h3 class="text-xl font-medium text-black">{job.title}</h3>
+        <p class="text-sm text-gray-600 mt-1">Click to view details and apply</p>
+      </div>
+    </div>
+    <div
+      class="bg-gray w-[58px] h-[58px] flex justify-center items-center rounded-full border border-dark"
+    >
+      <div
+        class="job-accordion-icon h-10 w-10 transition-transform duration-300 flex justify-center items-center relative"
+        aria-hidden="true"
+      >
+      </div>
+    </div>
+  </button>
+  <div
+    id={`job-${job.id}-accordion-content`}
+    aria-labelledby={`job-${job.id}-accordion-button`}
+    class="job-accordion-content px-[60px]"
+  >
+    <div class="w-full h-[2px] bg-black"></div>
+    <div class="pt-5 pb-[60px]">
       <!-- Job Description Preview -->
       <div class="prose prose-sm max-w-none mb-6">
         <div set:html={previewDescription} />
@@ -26,57 +54,130 @@ const previewDescription = htmlDescription.split('---')[0];
       
       <!-- Actions -->
       <div class="flex flex-col sm:flex-row gap-4">
-        <button 
-          data-apply-job
-          data-job={JSON.stringify(job)}
-          class="px-6 py-3 bg-black text-white rounded-[14px] hover:bg-gray-800 transition-colors duration-200 font-medium"
+        <a 
+          href={`/careers/${job.id}?job=${job.id}`}
+          class="inline-block px-6 py-3 bg-black text-white rounded-[14px] hover:bg-gray-800 transition-colors duration-200 font-medium text-center"
         >
-          Apply Now
-        </button>
+          Apply for this Position
+        </a>
         
-        <button 
-          class="toggle-details-btn px-6 py-3 border border-black text-black rounded-[14px] hover:bg-gray-50 transition-colors duration-200 font-medium"
-          data-target={`job-${job.id}`}
+        <a 
+          href={`/careers/${job.id}?job=${job.id}`}
+          class="inline-block px-6 py-3 border border-black text-black rounded-[14px] hover:bg-gray-50 transition-colors duration-200 font-medium text-center"
         >
-          View Details
-        </button>
+          View Full Details
+        </a>
       </div>
-    </div>
-  </div>
-  
-  <!-- Expanded Job Details (Hidden by default) -->
-  <div id={`job-${job.id}`} class="hidden mt-8 pt-8 border-t border-gray-200">
-    <div class="prose prose-lg max-w-none">
-      <div set:html={htmlDescription} />
     </div>
   </div>
 </div>
 
+<style>
+  .job-accordion-icon::before,
+  .job-accordion-icon::after {
+    content: "";
+    position: absolute;
+    background-color: black;
+    transition: opacity 0.3s ease;
+  }
+
+  .job-accordion-icon::before {
+    width: 100%;
+    height: 6px;
+    left: 0;
+    top: calc(50% - 3px);
+  }
+
+  .job-accordion-icon::after {
+    width: 6px;
+    height: 100%;
+    left: calc(50% - 3px);
+    top: 0;
+  }
+
+  .job-accordion-icon.collapsed::after {
+    opacity: 0;
+  }
+</style>
+
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const toggleButtons = document.querySelectorAll('.toggle-details-btn');
-    
-    toggleButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        const target = e.target as HTMLButtonElement;
-        const jobId = target.getAttribute('data-target');
-        
-        if (!jobId) return;
-        
-        const element = document.getElementById(jobId);
-        if (!element) return;
-        
-        const isHidden = element.classList.contains('hidden');
-        
-        if (isHidden) {
-          element.classList.remove('hidden');
-          target.textContent = 'Hide Details';
-        } else {
-          element.classList.add('hidden');
-          target.textContent = 'View Details';
+  function jobAccordionSetup() {
+    const accordionItems = document.querySelectorAll(
+      ".job-accordion-item"
+    ) as NodeListOf<HTMLElement>;
+
+    accordionItems.forEach((accordionItem) => {
+      const accordionToggle = accordionItem.querySelector(".job-accordion-toggle");
+      const accordionIcon = accordionItem.querySelector(".job-accordion-icon");
+
+      if (accordionToggle && accordionIcon) {
+        accordionToggle.addEventListener("click", (e) => {
+          e.stopPropagation();
+
+          accordionItems.forEach((otherAccordionItem) => {
+            if (
+              otherAccordionItem !== accordionItem &&
+              otherAccordionItem.classList.contains("active")
+            ) {
+              const otherAccordionToggle =
+                otherAccordionItem.querySelector(".job-accordion-toggle");
+              const otherAccordionIcon =
+                otherAccordionItem.querySelector(".job-accordion-icon");
+
+              if (otherAccordionToggle && otherAccordionIcon) {
+                otherAccordionItem.classList.remove("active");
+                otherAccordionToggle.setAttribute("aria-expanded", "false");
+                otherAccordionItem.style.height = "160px";
+                otherAccordionIcon.classList.remove("rotate-180");
+                otherAccordionIcon.classList.remove("collapsed");
+              }
+            }
+          });
+
+          // Toggle current item
+          if (!accordionItem.classList.contains("active")) {
+            accordionItem.classList.add("active");
+            accordionToggle.setAttribute("aria-expanded", "true");
+            accordionItem.style.height = accordionItem.scrollHeight + "px";
+            accordionIcon.classList.add("rotate-180");
+            accordionIcon.classList.add("collapsed");
+          } else {
+            accordionItem.classList.remove("active");
+            accordionToggle.setAttribute("aria-expanded", "false");
+            accordionItem.style.height = "160px";
+            accordionIcon.classList.remove("rotate-180");
+            accordionIcon.classList.remove("collapsed");
+          }
+
+          e.preventDefault();
+          return false;
+        });
+      }
+    });
+
+
+    document.addEventListener("click", (event) => {
+      accordionItems.forEach((accordionItem) => {
+        const accordionToggle =
+          accordionItem.querySelector(".job-accordion-toggle");
+        const accordionIcon = accordionItem.querySelector(".job-accordion-icon");
+
+        if (
+          accordionToggle &&
+          accordionIcon &&
+          !accordionItem.contains(event.target as Node)
+        ) {
+          accordionItem.classList.remove("active");
+          accordionToggle.setAttribute("aria-expanded", "false");
+          accordionItem.style.height = "160px";
+          accordionIcon.classList.remove("rotate-180");
+          accordionIcon.classList.remove("collapsed");
         }
       });
     });
-  });
+  }
+
+  jobAccordionSetup();
+  document.addEventListener("astro:after-swap", jobAccordionSetup);
 </script>
 
