@@ -2,19 +2,18 @@ export const jobs = [
   {
     id: 1,
     title: "Backend Engineer (Node.js / PostgreSQL)",
-    description: `# ⚡ Backend Engineer – Node.js / PostgreSQL
-
-We are looking for a **Backend Engineer** who loves designing robust APIs, managing large-scale databases, and ensuring applications run like clockwork.  
+    description: `
+We are looking for a backend engineer who loves designing robust APIs, managing large-scale databases, and ensuring applications run like clockwork.  
 
 ---
 
-## 📌 About the Role
+## About the Role
 You will be working on building APIs, managing cloud infrastructure, and ensuring the backend systems can scale to support thousands of users.  
 Expect challenges like **performance optimization, database modeling, and designing fault-tolerant systems**.  
 
 ---
 
-## 🔧 Responsibilities
+## Responsibilities
 - Architect and develop REST/GraphQL APIs using **Node.js**  
 - Write optimized SQL queries for **PostgreSQL**  
 - Integrate third-party APIs and services  
@@ -25,7 +24,7 @@ Expect challenges like **performance optimization, database modeling, and design
 
 ---
 
-## 🎯 Requirements
+## Requirements
 - Strong proficiency in **JavaScript/TypeScript (Node.js)**  
 - Solid understanding of **PostgreSQL and relational database design**  
 - Experience with **Supabase or Firebase** is a big plus  
@@ -35,14 +34,14 @@ Expect challenges like **performance optimization, database modeling, and design
 
 ---
 
-## 💡 Nice-to-Have
+## Nice-to-Have
 - Knowledge of **Redis, RabbitMQ, Kafka**  
 - Hands-on with **Kubernetes**  
 - Prior experience in **microservices architecture**  
 
 ---
 
-## 🌍 Work Culture
+## Work Culture
 - Fully **remote-friendly**  
 - Pair programming & mentorship-driven environment  
 - Strong emphasis on **code quality and testing**  
@@ -50,7 +49,7 @@ Expect challenges like **performance optimization, database modeling, and design
 
 ---
 
-## 🎁 Perks & Benefits
+## Perks & Benefits
 - Competitive salary + equity options  
 - Health insurance + mental health allowance  
 - Paid time off + flexible work hours  
@@ -64,7 +63,7 @@ Expect challenges like **performance optimization, database modeling, and design
 
 ---
 
-> If backend scalability, database design, and API performance excite you, this is the right place for you! 🚀`,
+> If backend scalability, database design, and API performance excite you, this is the right place for you!`,
     is_active: true,
     fields: [
       {"name": "full_name", "label": "Full Name", "type": "text", "required": true},
@@ -83,19 +82,17 @@ Expect challenges like **performance optimization, database modeling, and design
   {
     id: 2,
     title: "Frontend Engineer (React / TypeScript)",
-    description: `# ⚡ Frontend Engineer – React / TypeScript
-
-We are looking for a **Frontend Engineer** who loves creating beautiful, responsive user interfaces and delivering exceptional user experiences.  
+    description: `We are looking for a frontend engineer who loves creating beautiful, responsive user interfaces and delivering exceptional user experiences.  
 
 ---
 
-## 📌 About the Role
+## About the Role
 You will be working on building modern web applications, creating reusable components, and ensuring seamless user interactions.  
 Expect challenges like **performance optimization, state management, and creating pixel-perfect responsive designs**.  
 
 ---
 
-## 🔧 Responsibilities
+## Responsibilities
 - Build modern web applications using **React & TypeScript**  
 - Create reusable UI components and design systems  
 - Implement responsive designs that work across all devices  
@@ -105,7 +102,7 @@ Expect challenges like **performance optimization, state management, and creatin
 
 ---
 
-## 🎯 Requirements
+## Requirements
 - Strong proficiency in **React, TypeScript, and modern JavaScript**  
 - Experience with **CSS3, SASS/SCSS, and responsive design**  
 - Knowledge of state management (Redux, Zustand, or Context API)  
@@ -115,7 +112,7 @@ Expect challenges like **performance optimization, state management, and creatin
 
 ---
 
-## 💡 Nice-to-Have
+## Nice-to-Have
 - Experience with **Tailwind CSS or styled-components**  
 - Knowledge of **GraphQL and Apollo Client**  
 - Familiarity with **testing frameworks (Jest, React Testing Library)**  
@@ -143,19 +140,17 @@ Expect challenges like **performance optimization, state management, and creatin
   {
     id: 3,
     title: "DevOps Engineer (AWS / Docker)",
-    description: `# ⚡ DevOps Engineer – AWS / Docker
-
-We are looking for a **DevOps Engineer** who loves automating deployments, managing cloud infrastructure, and ensuring system reliability.  
+    description: `We are looking for a DevOps engineer who loves automating deployments, managing cloud infrastructure, and ensuring system reliability.  
 
 ---
 
-## 📌 About the Role
+## About the Role
 You will be working on building CI/CD pipelines, managing cloud infrastructure, and ensuring our applications run smoothly in production.  
 Expect challenges like **infrastructure automation, monitoring, and scaling applications**.  
 
 ---
 
-## 🔧 Responsibilities
+## Responsibilities
 - Design and manage **AWS cloud infrastructure**  
 - Build and maintain **CI/CD pipelines**  
 - Containerize applications using **Docker and Kubernetes**  
@@ -165,7 +160,7 @@ Expect challenges like **infrastructure automation, monitoring, and scaling appl
 
 ---
 
-## 🎯 Requirements
+## Requirements
 - Strong experience with **AWS services (EC2, S3, RDS, Lambda)**  
 - Proficiency in **Docker and container orchestration**  
 - Experience with **CI/CD tools (GitHub Actions, Jenkins, GitLab CI)**  
@@ -175,7 +170,7 @@ Expect challenges like **infrastructure automation, monitoring, and scaling appl
 
 ---
 
-## 💡 Nice-to-Have
+## Nice-to-Have
 - **Kubernetes** experience  
 - Knowledge of **security scanning and compliance tools**  
 - Experience with **microservices architecture**  

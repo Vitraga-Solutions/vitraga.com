@@ -15,10 +15,11 @@ if (!job) {
 
 marked.setOptions({
   breaks: true,
-  gfm: true
+  gfm: true,
 });
 
 const htmlDescription = await marked(job.description);
+console.log(htmlDescription);
 ---
 
 <MainLayout title={`${job.title} - Careers`} description={`Apply for ${job.title} position at our company.`}>
@@ -67,7 +68,7 @@ const htmlDescription = await marked(job.description);
           </div>
 
           <!-- Job Description Content -->
-          <div class="prose prose-lg max-w-none">
+          <div class="prose prose-lg max-w-none job-description">
             <div set:html={htmlDescription} />
           </div>
         </div>
@@ -75,7 +76,7 @@ const htmlDescription = await marked(job.description);
         <!-- Right Column - Application Form -->
         <div class="lg:sticky lg:top-8 lg:self-start">
           <div class="bg-[#F3F3F3] rounded-[24px] p-8 border border-dark shadow-[0px_5px_0px_#191a23]">
-            <h2 class="text-2xl font-bold text-black mb-6">Apply for this Position</h2>
+            <h2 class="text-xl font-bold text-black mb-6">Apply for this Position</h2>
             
             <form id="job-application-form" class="space-y-6">
               <input type="hidden" name="job_id" value={job.id} />
@@ -274,3 +275,22 @@ const htmlDescription = await marked(job.description);
     return fieldContainer;
   }
 </script>
+
+<style>
+  .job-description :global(h1) {
+    font-size: 2.5rem;
+  }
+  
+  .job-description :global(h2) {
+    font-size: 2rem;
+  }
+  
+  .job-description :global(h3) {
+    font-size: 1.5rem;
+  }
+
+  .job-description :global(hr) {
+    border-color: #D1D5DB; /* Tailwind gray-300 */
+    margin: 1.5rem 0;
+  }
+</style>
