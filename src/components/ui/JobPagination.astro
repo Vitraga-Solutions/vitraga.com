@@ -1,0 +1,143 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  hasMore: boolean;
+  searchQuery?: string;
+}
+
+const { currentPage, totalPages, hasMore, searchQuery = '' } = Astro.props;
+
+// Calculate pagination range
+const maxVisible = 5;
+let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+// Adjust start if we're near the end
+if (endPage - startPage + 1 < maxVisible) {
+  startPage = Math.max(1, endPage - maxVisible + 1);
+}
+
+const pages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+
+function buildUrl(page: number): string {
+  const params = new URLSearchParams();
+  params.set('page', page.toString());
+  if (searchQuery) {
+    params.set('search', searchQuery);
+  }
+  return `/careers?${params.toString()}`;
+}
+---
+
+{totalPages > 1 && (
+  <nav class="flex justify-center mt-12" aria-label="Pagination Navigation">
+    <div class="flex items-center space-x-2">
+      <!-- Previous Button -->
+      {currentPage > 1 ? (
+        <a
+          href={buildUrl(currentPage - 1)}
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 transition-colors"
+          aria-label="Go to previous page"
+        >
+          <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Previous
+        </a>
+      ) : (
+        <span class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed">
+          <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Previous
+        </span>
+      )}
+
+      <!-- Page Numbers -->
+      {startPage > 1 && (
+        <>
+          <a
+            href={buildUrl(1)}
+            class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 transition-colors"
+          >
+            1
+          </a>
+          {startPage > 2 && (
+            <span class="px-2 py-2 text-gray-500">...</span>
+          )}
+        </>
+      )}
+
+      {pages.map((page) => (
+        page === currentPage ? (
+          <span
+            class="px-3 py-2 text-sm font-medium text-white bg-black border border-black rounded-lg"
+            aria-current="page"
+          >
+            {page}
+          </span>
+        ) : (
+          <a
+            href={buildUrl(page)}
+            class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 transition-colors"
+          >
+            {page}
+          </a>
+        )
+      ))}
+
+      {endPage < totalPages && (
+        <>
+          {endPage < totalPages - 1 && (
+            <span class="px-2 py-2 text-gray-500">...</span>
+          )}
+          <a
+            href={buildUrl(totalPages)}
+            class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 transition-colors"
+          >
+            {totalPages}
+          </a>
+        </>
+      )}
+
+      <!-- Next Button -->
+      {hasMore ? (
+        <a
+          href={buildUrl(currentPage + 1)}
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 transition-colors"
+          aria-label="Go to next page"
+        >
+          Next
+          <svg class="w-4 h-4 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      ) : (
+        <span class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-300 rounded-lg cursor-not-allowed">
+          Next
+          <svg class="w-4 h-4 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </span>
+      )}
+    </div>
+  </nav>
+)}
+
+<!-- Results Summary -->
+<div class="text-center mt-4 text-sm text-gray-600">
+  {searchQuery ? (
+    <p>
+      {hasMore || currentPage > 1 ? (
+        `Showing page ${currentPage} of search results for "${searchQuery}"`
+      ) : (
+        `Found results for "${searchQuery}"`
+      )}
+    </p>
+  ) : (
+    hasMore || currentPage > 1 ? (
+      <p>Page {currentPage} of {totalPages}</p>
+    ) : null
+  )}
+</div>

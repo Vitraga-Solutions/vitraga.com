@@ -1,0 +1,201 @@
+---
+import { marked } from 'marked';
+
+const { job } = Astro.props;
+
+// Configure marked for better rendering
+marked.setOptions({
+  breaks: true,
+  gfm: true
+});
+
+const htmlDescription = await marked(job.description);
+const previewDescription = htmlDescription.split('---')[0];
+---
+
+<div
+  id={`job-accordion-${job.id}`}
+  class="job-accordion-item group h-[160px] bg-[#F3F3F3] overflow-hidden w-full transition-all duration-500 mb-[5px] rounded-[45px] border border-dark shadow-[0px_5px_0px_#191a23]"
+>
+  <button
+    class="job-accordion-toggle w-full h-[160px] flex items-center justify-between p-[60px] cursor-pointer"
+    id={`job-${job.id}-accordion-button`}
+    aria-expanded="false"
+    aria-controls={`job-${job.id}-accordion-content`}
+  >
+    <div class="flex items-center gap-[25px]">
+      <span class="hidden sm:block sm:text-6xl">{String(job.id).length < 2 ? `0${job.id}` : job.id}</span>
+      <div class="text-left">
+        <h3 class="text-xl font-medium text-black">{job.title}</h3>
+        <p class="text-sm text-gray-600 mt-1">Click to view details and apply</p>
+      </div>
+    </div>
+    <div
+      class="bg-gray w-[58px] h-[58px] flex justify-center items-center rounded-full border border-dark"
+    >
+      <div
+        class="job-accordion-icon h-10 w-10 transition-transform duration-300 flex justify-center items-center relative"
+        aria-hidden="true"
+      >
+      </div>
+    </div>
+  </button>
+  <div
+    id={`job-${job.id}-accordion-content`}
+    aria-labelledby={`job-${job.id}-accordion-button`}
+    class="job-accordion-content px-[60px]"
+  >
+    <div class="w-full h-[2px] bg-black"></div>
+    <div class="pt-5 pb-[60px]">
+      <!-- Job Description Preview -->
+      <div class="prose prose-lg max-w-none job-description">
+        <div set:html={previewDescription} />
+      </div>
+      
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row gap-4 mt-5">
+        <a 
+          href={`/careers/${job.id}`}
+          class="inline-block px-6 py-3 bg-black text-white rounded-[14px] hover:bg-gray-800 transition-colors duration-200 font-medium text-center"
+        >
+          Apply for this Position
+        </a>
+        
+        <a 
+          href={`/careers/${job.id}`}
+          class="inline-block px-6 py-3 border border-black text-black rounded-[14px] hover:bg-gray-50 transition-colors duration-200 font-medium text-center"
+        >
+          View Full Details
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .job-accordion-icon::before,
+  .job-accordion-icon::after {
+    content: "";
+    position: absolute;
+    background-color: black;
+    transition: opacity 0.3s ease;
+  }
+
+  .job-accordion-icon::before {
+    width: 100%;
+    height: 6px;
+    left: 0;
+    top: calc(50% - 3px);
+  }
+
+  .job-accordion-icon::after {
+    width: 6px;
+    height: 100%;
+    left: calc(50% - 3px);
+    top: 0;
+  }
+
+  .job-accordion-icon.collapsed::after {
+    opacity: 0;
+  }
+
+
+  .job-description :global(h1) {
+    font-size: 2rem;
+  }
+  
+  .job-description :global(h2) {
+    font-size: 1.5rem;
+  }
+  
+  .job-description :global(h3) {
+    font-size: 1.5rem;
+  }
+
+  .job-description :global(hr) {
+    border-color: #D1D5DB; /* Tailwind gray-300 */
+    margin: 1.3rem 0;
+  }
+</style>
+
+<script>
+  function jobAccordionSetup() {
+    const accordionItems = document.querySelectorAll(
+      ".job-accordion-item"
+    ) as NodeListOf<HTMLElement>;
+
+    accordionItems.forEach((accordionItem) => {
+      const accordionToggle = accordionItem.querySelector(".job-accordion-toggle");
+      const accordionIcon = accordionItem.querySelector(".job-accordion-icon");
+
+      if (accordionToggle && accordionIcon) {
+        accordionToggle.addEventListener("click", (e) => {
+          e.stopPropagation();
+
+          accordionItems.forEach((otherAccordionItem) => {
+            if (
+              otherAccordionItem !== accordionItem &&
+              otherAccordionItem.classList.contains("active")
+            ) {
+              const otherAccordionToggle =
+                otherAccordionItem.querySelector(".job-accordion-toggle");
+              const otherAccordionIcon =
+                otherAccordionItem.querySelector(".job-accordion-icon");
+
+              if (otherAccordionToggle && otherAccordionIcon) {
+                otherAccordionItem.classList.remove("active");
+                otherAccordionToggle.setAttribute("aria-expanded", "false");
+                otherAccordionItem.style.height = "160px";
+                otherAccordionIcon.classList.remove("rotate-180");
+                otherAccordionIcon.classList.remove("collapsed");
+              }
+            }
+          });
+
+          // Toggle current item
+          if (!accordionItem.classList.contains("active")) {
+            accordionItem.classList.add("active");
+            accordionToggle.setAttribute("aria-expanded", "true");
+            accordionItem.style.height = accordionItem.scrollHeight + "px";
+            accordionIcon.classList.add("rotate-180");
+            accordionIcon.classList.add("collapsed");
+          } else {
+            accordionItem.classList.remove("active");
+            accordionToggle.setAttribute("aria-expanded", "false");
+            accordionItem.style.height = "160px";
+            accordionIcon.classList.remove("rotate-180");
+            accordionIcon.classList.remove("collapsed");
+          }
+
+          e.preventDefault();
+          return false;
+        });
+      }
+    });
+
+
+    document.addEventListener("click", (event) => {
+      accordionItems.forEach((accordionItem) => {
+        const accordionToggle =
+          accordionItem.querySelector(".job-accordion-toggle");
+        const accordionIcon = accordionItem.querySelector(".job-accordion-icon");
+
+        if (
+          accordionToggle &&
+          accordionIcon &&
+          !accordionItem.contains(event.target as Node)
+        ) {
+          accordionItem.classList.remove("active");
+          accordionToggle.setAttribute("aria-expanded", "false");
+          accordionItem.style.height = "160px";
+          accordionIcon.classList.remove("rotate-180");
+          accordionIcon.classList.remove("collapsed");
+        }
+      });
+    });
+  }
+
+  jobAccordionSetup();
+  document.addEventListener("astro:after-swap", jobAccordionSetup);
+</script>
+
