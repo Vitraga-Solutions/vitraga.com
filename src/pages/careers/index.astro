@@ -1,11 +1,21 @@
 ---
 import Section from "../../components/sections/Section.astro";
 import JobCard from "../../components/ui/JobCard.astro";
+import JobPagination from "../../components/ui/JobPagination.astro";
+import JobSearchForm from "../../components/ui/JobSearchForm.astro";
 import SectionTitle from "../../components/ui/SectionTitle.astro";
 import MainLayout from "../../layouts/MainLayout.astro";
 import { getActiveJobs } from "../../lib/supabase";
 
-const activeJobs = await getActiveJobs();
+// Get query parameters
+const url = new URL(Astro.request.url);
+const searchQuery = url.searchParams.get('search') || '';
+const currentPage = parseInt(url.searchParams.get('page') || '1');
+const jobsPerPage = 5; // Show 5 jobs per page
+
+// Fetch jobs with pagination and search
+const { jobs: activeJobs, totalCount, hasMore } = await getActiveJobs(currentPage, jobsPerPage, searchQuery);
+const totalPages = Math.ceil(totalCount / jobsPerPage);
 ---
 
 <MainLayout title="Careers - Join Our Team" description="Explore exciting career opportunities and join our innovative team.">
@@ -16,16 +26,54 @@ const activeJobs = await getActiveJobs();
         description="We're looking for passionate individuals who want to build the future of technology. Explore our open positions and find your next career opportunity."
       />
       
-      <div class="grid gap-8 md:grid-cols-1 lg:grid-cols-1">
-        {activeJobs.map((job) => (
-          <JobCard job={job} />
-        ))}
-      </div>
+      <!-- Search Form -->
+      <JobSearchForm currentQuery={searchQuery} currentPage={currentPage} />
       
-      {activeJobs.length === 0 && (
+      <!-- Jobs Results -->
+      {activeJobs.length > 0 ? (
+        <>
+          <!-- Results Summary -->
+          <div class="mb-6">
+            <p class="text-gray-600">
+              {searchQuery ? (
+                `Found ${totalCount} job${totalCount !== 1 ? 's' : ''} matching "${searchQuery}"`
+              ) : (
+                `Showing ${totalCount} open position${totalCount !== 1 ? 's' : ''}`
+              )}
+            </p>
+          </div>
+          
+          <!-- Job Cards -->
+          <div class="grid gap-8 md:grid-cols-1 lg:grid-cols-1 mb-8">
+            {activeJobs.map((job) => (
+              <JobCard job={job} />
+            ))}
+          </div>
+          
+          <!-- Pagination -->
+          <JobPagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            hasMore={hasMore}
+            searchQuery={searchQuery}
+          />
+        </>
+      ) : (
         <div class="text-center py-20">
-          <h3 class="text-2xl font-medium mb-4">No Open Positions</h3>
-          <p class="text-gray-600">We don't have any open positions at the moment, but we're always looking for talented individuals. Feel free to reach out to us!</p>
+          {searchQuery ? (
+            <>
+              <h3 class="text-2xl font-medium mb-4">No Jobs Found</h3>
+              <p class="text-gray-600 mb-6">
+                We couldn't find any jobs matching "{searchQuery}". Try adjusting your search terms or 
+                <a href="/careers" class="text-blue-600 hover:text-blue-800 underline">browse all positions</a>.
+              </p>
+            </>
+          ) : (
+            <>
+              <h3 class="text-2xl font-medium mb-4">No Open Positions</h3>
+              <p class="text-gray-600">We don't have any open positions at the moment, but we're always looking for talented individuals. Feel free to reach out to us!</p>
+            </>
+          )}
         </div>
       )}
     </div>

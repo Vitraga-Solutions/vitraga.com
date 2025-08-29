@@ -25,8 +25,41 @@ export interface JobApplication {
     created_at: string;
 }
 
-// Function to fetch all active jobs
-export async function getActiveJobs(): Promise<Job[]> {
+// Function to fetch all active jobs with pagination and search
+export async function getActiveJobs(page: number = 1, limit: number = 10, searchQuery?: string): Promise<{ jobs: Job[], totalCount: number, hasMore: boolean }> {
+    const offset = (page - 1) * limit;
+
+    let query = supabase
+        .from('jobs')
+        .select('*', { count: 'exact' })
+        .eq('is_active', true);
+
+    // Add search filter if provided
+    if (searchQuery && searchQuery.trim()) {
+        query = query.ilike('title', `%${searchQuery.trim()}%`);
+    }
+
+    const { data, error, count } = await query
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+    if (error) {
+        console.error('Error fetching jobs:', error);
+        return { jobs: [], totalCount: 0, hasMore: false };
+    }
+
+    const totalCount = count || 0;
+    const hasMore = totalCount > offset + limit;
+
+    return {
+        jobs: data || [],
+        totalCount,
+        hasMore
+    };
+}
+
+// Function to fetch all active jobs (for backward compatibility)
+export async function getAllActiveJobs(): Promise<Job[]> {
     const { data, error } = await supabase
         .from('jobs')
         .select('*')
