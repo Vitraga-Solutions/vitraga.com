@@ -1,0 +1,82 @@
+---
+import { marked } from 'marked';
+
+const { job } = Astro.props;
+
+// Configure marked for better rendering
+marked.setOptions({
+  breaks: true,
+  gfm: true
+});
+
+const htmlDescription = await marked(job.description);
+const previewDescription = htmlDescription.split('---')[0];
+---
+
+<div class="bg-white border border-gray-200 rounded-[24px] p-8 shadow-sm hover:shadow-md transition-shadow duration-200">
+  <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+    <!-- Job Info -->
+    <div class="flex-1">
+      <h3 class="text-2xl font-medium text-black mb-4">{job.title}</h3>
+      
+      <!-- Job Description Preview -->
+      <div class="prose prose-sm max-w-none mb-6">
+        <div set:html={previewDescription} />
+      </div>
+      
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row gap-4">
+        <button 
+          data-apply-job
+          data-job={JSON.stringify(job)}
+          class="px-6 py-3 bg-black text-white rounded-[14px] hover:bg-gray-800 transition-colors duration-200 font-medium"
+        >
+          Apply Now
+        </button>
+        
+        <button 
+          class="toggle-details-btn px-6 py-3 border border-black text-black rounded-[14px] hover:bg-gray-50 transition-colors duration-200 font-medium"
+          data-target={`job-${job.id}`}
+        >
+          View Details
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Expanded Job Details (Hidden by default) -->
+  <div id={`job-${job.id}`} class="hidden mt-8 pt-8 border-t border-gray-200">
+    <div class="prose prose-lg max-w-none">
+      <div set:html={htmlDescription} />
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggleButtons = document.querySelectorAll('.toggle-details-btn');
+    
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const target = e.target as HTMLButtonElement;
+        const jobId = target.getAttribute('data-target');
+        
+        if (!jobId) return;
+        
+        const element = document.getElementById(jobId);
+        if (!element) return;
+        
+        const isHidden = element.classList.contains('hidden');
+        
+        if (isHidden) {
+          element.classList.remove('hidden');
+          target.textContent = 'Hide Details';
+        } else {
+          element.classList.add('hidden');
+          target.textContent = 'View Details';
+        }
+      });
+    });
+  });
+</script>
+
