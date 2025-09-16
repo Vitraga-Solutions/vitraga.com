@@ -281,11 +281,15 @@ export const prerender = true;
         if (isExpanded) {
           mobileToc.classList.add('hidden');
           this.setAttribute('aria-expanded', 'false');
-          toggleIcon.style.transform = 'rotate(0deg)';
+          if (toggleIcon) {
+            toggleIcon.style.transform = 'rotate(0deg)';
+          }
         } else {
           mobileToc.classList.remove('hidden');
           this.setAttribute('aria-expanded', 'true');
-          toggleIcon.style.transform = 'rotate(180deg)';
+          if (toggleIcon) {
+            toggleIcon.style.transform = 'rotate(180deg)';
+          }
         }
       });
     }

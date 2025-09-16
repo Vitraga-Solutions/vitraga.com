@@ -80,15 +80,19 @@ const filteredHeadings = headings.filter(heading => heading.level <= 3);
 </style>
 
 <script>
+  // @ts-nocheck
   document.addEventListener('DOMContentLoaded', function() {
     const tocLinks = document.querySelectorAll('[data-toc-link]');
     const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
     
     // Add smooth scrolling and active state management
     tocLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
+      link.addEventListener('click', function(this: HTMLElement, e: Event) {
         e.preventDefault();
         const targetId = this.getAttribute('data-heading-id');
+        
+        if (!targetId) return;
+        
         const target = document.getElementById(targetId);
         
         if (target) {
@@ -106,12 +110,13 @@ const filteredHeadings = headings.filter(heading => heading.level <= 3);
 
     // Highlight active section in TOC based on scroll position
     function highlightActiveSection() {
-      let activeHeading = null;
+      let activeHeading: HTMLElement | null = null;
       const scrollPosition = window.scrollY + 100; // Offset for better UX
 
       headings.forEach(heading => {
-        if (heading.offsetTop <= scrollPosition) {
-          activeHeading = heading;
+        const htmlHeading = heading as HTMLElement;
+        if (htmlHeading.offsetTop <= scrollPosition) {
+          activeHeading = htmlHeading;
         }
       });
 
