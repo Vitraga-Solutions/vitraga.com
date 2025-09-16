@@ -59,68 +59,62 @@ function formatReadTime(content: string) {
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogs.map((blog) => (
               <Card isUnderline={true} rounded={'rounded-[25px]'}>
-                <article class="p-6 bg-white h-full flex flex-col overflow-hidden">
-                  <!-- Cover Image -->
-                  {blog.data.coverImage && (
-                    <div class="mb-6 rounded-2xl overflow-hidden">
-                      <img 
-                        src={blog.data.coverImage.src} 
-                        alt={blog.data.title}
-                        class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                  )}
-
-                  <!-- Tags -->
-                  <div class="flex flex-wrap gap-2 mb-4">
-                    {blog.data.tags.slice(0, 3).map((tag: string) => (
-                      <span class="bg-green text-black text-xs font-medium px-2.5 py-1 rounded-full">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <!-- Title -->
-                  <h2 class="text-xl font-bold text-dark mb-3 line-clamp-2 flex-grow">
-                    {blog.data.title}
-                  </h2>
-
-                  <!-- Excerpt -->
-                  {blog.data.excerpt && (
-                    <p class="text-gray-600 mb-4 line-clamp-3 text-sm">
-                      {blog.data.excerpt}
-                    </p>
-                  )}
-
-                  <!-- Meta Info -->
-                  <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-200">
-                    <div class="flex items-center space-x-3">
+                <a 
+                  href={`/blogs/${blog.slug}`}
+                  class="block h-full transition-transform duration-300 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2 rounded-[25px]"
+                >
+                  <article class="p-6 bg-white h-full flex flex-col overflow-hidden">
+                    <!-- Cover Image -->
+                    {blog.data.coverImage && (
+                      <div class="mb-6 rounded-2xl overflow-hidden">
                         <img 
-                          src={'../logo.png'} 
-                          alt={COMPANY_NAME}
-                          class="w-8 h-8 rounded-full object-cover"
+                          src={blog.data.coverImage.src} 
+                          alt={blog.data.title}
+                          class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
                         />
-                      <div>
-                        <p class="text-sm font-medium text-dark">{COMPANY_NAME}</p>
-                        <p class="text-xs text-gray-500">{blog.data.publishedDate}</p>
+                      </div>
+                    )}
+
+                    <!-- Tags -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                      {blog.data.tags.slice(0, 3).map((tag: string) => (
+                        <span class="bg-green text-black text-xs font-medium px-2.5 py-1 rounded-full">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <!-- Title -->
+                    <h2 class="text-xl font-bold text-dark mb-3 line-clamp-2 flex-grow">
+                      {blog.data.title}
+                    </h2>
+
+                    <!-- Excerpt -->
+                    {blog.data.excerpt && (
+                      <p class="text-gray-600 mb-4 line-clamp-3 text-sm">
+                        {blog.data.excerpt}
+                      </p>
+                    )}
+
+                    <!-- Meta Info -->
+                    <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-200">
+                      <div class="flex items-center space-x-3">
+                          <img 
+                            src={'../logo.png'} 
+                            alt={COMPANY_NAME}
+                            class="w-8 h-8 rounded-full object-cover"
+                          />
+                        <div>
+                          <p class="text-sm font-medium text-dark">{COMPANY_NAME}</p>
+                          <p class="text-xs text-gray-500">{blog.data.publishedDate}</p>
+                        </div>
+                      </div>
+                      <div class="text-xs text-gray-500">
+                        {formatReadTime(blog.body)}
                       </div>
                     </div>
-                    <div class="text-xs text-gray-500">
-                      {formatReadTime(blog.body)}
-                    </div>
-                  </div>
-
-                  <!-- Read More Button -->
-                  <a 
-                    href={`/blogs/${blog.slug}`}
-                    class="inline-flex items-center justify-center w-full mt-4 px-4 py-2 bg-dark text-white rounded-lg hover:bg-green hover:text-black transition-colors duration-200 font-medium text-sm"
-                  >
-                    Read Article
-                    <svg class="ml-2 w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                    </svg>
-                  </a>
-                </article>
+                  </article>
+                </a>
               </Card>
             ))}
           </div>
