@@ -1,0 +1,183 @@
+---
+import { getCollection } from "astro:content";
+import MainLayout from "../../layouts/MainLayout.astro";
+import Card from "../../components/ui/Card.astro";
+import { COMPANY_NAME } from "../../constants";
+
+// Pagination configuration
+const POSTS_PER_PAGE = 6;
+const page = parseInt(Astro.url.searchParams.get('page') || '1');
+
+const allBlogs = await getCollection("blogs");
+const sortedBlogs = allBlogs.sort((a, b) => 
+  new Date(b.data.publishedDate).getTime() - new Date(a.data.publishedDate).getTime()
+);
+
+const totalPages = Math.ceil(sortedBlogs.length / POSTS_PER_PAGE);
+const startIndex = (page - 1) * POSTS_PER_PAGE;
+const endIndex = startIndex + POSTS_PER_PAGE;
+const blogs = sortedBlogs.slice(startIndex, endIndex);
+
+function formatReadTime(content: string) {
+  const words = content.split(/\s+/).length;
+  const readTime = Math.ceil(words / 200); // Average reading speed
+  return `${readTime} min read`;
+}
+---
+
+<MainLayout title="Blogs - Vitraga" description="Explore our latest insights on technology, development, and innovation">
+  <main class="min-h-screen bg-white">
+    <!-- Hero Section -->
+    <section class="py-16 px-4 bg-gradient-to-b from-gray to-white">
+      <div class="max-w-6xl mx-auto text-center">
+        <h1 class="text-5xl lg:text-6xl font-bold text-dark mb-6 font-grotesk">
+          Our <span class="greenhead">Blog</span>
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+          Insights, tutorials, and thoughts on modern web development, AI, and technology trends
+        </p>
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+          <span class="bg-green text-black px-4 py-2 rounded-full text-sm font-medium">
+            {sortedBlogs.length} Articles
+          </span>
+          <span class="bg-dark text-white px-4 py-2 rounded-full text-sm font-medium">
+            Page {page} of {totalPages}
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Blog Grid -->
+    <section class="pb-16 px-4">
+      <div class="max-w-6xl mx-auto">
+        {blogs.length === 0 ? (
+          <div class="text-center py-16">
+            <h2 class="text-2xl font-bold text-dark mb-4">No blogs found</h2>
+            <p class="text-gray-600">Check back soon for new content!</p>
+          </div>
+        ) : (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {blogs.map((blog) => (
+              <Card isUnderline={true} rounded={'rounded-[25px]'}>
+                <article class="p-6 bg-white h-full flex flex-col overflow-hidden">
+                  <!-- Cover Image -->
+                  {blog.data.coverImage && (
+                    <div class="mb-6 rounded-2xl overflow-hidden">
+                      <img 
+                        src={blog.data.coverImage.src} 
+                        alt={blog.data.title}
+                        class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  )}
+
+                  <!-- Tags -->
+                  <div class="flex flex-wrap gap-2 mb-4">
+                    {blog.data.tags.slice(0, 3).map((tag: string) => (
+                      <span class="bg-green text-black text-xs font-medium px-2.5 py-1 rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <!-- Title -->
+                  <h2 class="text-xl font-bold text-dark mb-3 line-clamp-2 flex-grow">
+                    {blog.data.title}
+                  </h2>
+
+                  <!-- Excerpt -->
+                  {blog.data.excerpt && (
+                    <p class="text-gray-600 mb-4 line-clamp-3 text-sm">
+                      {blog.data.excerpt}
+                    </p>
+                  )}
+
+                  <!-- Meta Info -->
+                  <div class="flex items-center justify-between mt-auto pt-4 border-t border-gray-200">
+                    <div class="flex items-center space-x-3">
+                        <img 
+                          src={'../logo.png'} 
+                          alt={COMPANY_NAME}
+                          class="w-8 h-8 rounded-full object-cover"
+                        />
+                      <div>
+                        <p class="text-sm font-medium text-dark">{COMPANY_NAME}</p>
+                        <p class="text-xs text-gray-500">{blog.data.publishedDate}</p>
+                      </div>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                      {formatReadTime(blog.body)}
+                    </div>
+                  </div>
+
+                  <!-- Read More Button -->
+                  <a 
+                    href={`/blogs/${blog.slug}`}
+                    class="inline-flex items-center justify-center w-full mt-4 px-4 py-2 bg-dark text-white rounded-lg hover:bg-green hover:text-black transition-colors duration-200 font-medium text-sm"
+                  >
+                    Read Article
+                    <svg class="ml-2 w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                  </a>
+                </article>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- Pagination -->
+    {totalPages > 1 && (
+      <section class="py-12 px-4">
+        <div class="max-w-6xl mx-auto">
+          <nav class="flex justify-center items-center space-x-4">
+            <!-- Previous Button -->
+            <a 
+              href={page > 1 ? `/blogs?page=${page - 1}` : '#'}
+              class={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                page > 1 
+                  ? 'bg-dark text-white hover:bg-green hover:text-black' 
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+              aria-disabled={page <= 1}
+            >
+              Previous
+            </a>
+
+            <!-- Page Numbers -->
+            <div class="flex space-x-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                <a 
+                  href={`/blogs?page=${pageNum}`}
+                  class={`px-3 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                    pageNum === page
+                      ? 'bg-green text-black'
+                      : 'bg-gray-100 text-dark hover:bg-dark hover:text-white'
+                  }`}
+                >
+                  {pageNum}
+                </a>
+              ))}
+            </div>
+
+            <!-- Next Button -->
+            <a 
+              href={page < totalPages ? `/blogs?page=${page + 1}` : '#'}
+              class={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                page < totalPages 
+                  ? 'bg-dark text-white hover:bg-green hover:text-black' 
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+              aria-disabled={page >= totalPages}
+            >
+              Next
+            </a>
+          </nav>
+        </div>
+      </section>
+    )}
+  </main>
+</MainLayout>
+

@@ -164,6 +164,122 @@
   font-weight: bold;
 }
 
+/* Enhanced code block styling */
 pre.astro-code {
   padding: 2rem;
+  border-radius: 12px;
+  position: relative;
+  background: #0f172a !important;
+  border: 1px solid #334155;
+  overflow-x: auto;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.content pre {
+  margin: 2rem 0;
+}
+
+.content code:not(pre code) {
+  background: #f1f5f9;
+  color: #0f172a;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.875em;
+  font-weight: 500;
+}
+
+/* Syntax highlighting improvements */
+.astro-code .line {
+  padding: 0 1rem;
+}
+
+.astro-code .line:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Better table styling */
+.content table {
+  border-collapse: collapse;
+  margin: 2rem 0;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.content th,
+.content td {
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.content th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.content tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+/* Better blockquote styling */
+.content blockquote {
+  border-left: 4px solid #93bcff;
+  background: #f8fafc;
+  padding: 1rem 1.5rem;
+  margin: 2rem 0;
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+
+.content blockquote p {
+  margin: 0;
+  color: #475569;
+}
+
+/* Image styling */
+.content img {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin: 2rem 0;
+}
+
+/* List styling */
+.content ul,
+.content ol {
+  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.content li {
+  margin: 0.5rem 0;
+}
+
+.content ul li::marker {
+  color: #93bcff;
+}
+
+.content ol li::marker {
+  color: #93bcff;
+  font-weight: 600;
+}
+
+/* Line clamping utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
