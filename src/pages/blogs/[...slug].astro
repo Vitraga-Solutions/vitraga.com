@@ -168,7 +168,7 @@ export const prerender = true;
         </footer>
 
         <!-- Navigation -->
-        <nav class="mt-12 pt-8 border-t border-gray-200">
+        <nav class="my-12 pt-8 border-t border-gray-200">
           <a 
             href="/blogs"
             class="inline-flex items-center px-6 py-3 bg-dark text-white rounded-lg hover:bg-green hover:text-black transition-colors duration-200 font-medium"
@@ -181,42 +181,6 @@ export const prerender = true;
   </article>
 </MainLayout>
 
-<!-- <style>
-  /* Custom styles for code blocks with copy functionality */
-  .content pre {
-    position: relative;
-  }
-
-  .content pre:hover .copy-button {
-    opacity: 1;
-  }
-
-  .copy-button {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-
-  .copy-button:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  .copy-button.copied {
-    background: #93bcff;
-    color: black;
-  }
-</style> -->
-
 <script>
   // Add copy buttons to code blocks
   document.addEventListener('DOMContentLoaded', function() {
@@ -227,6 +191,10 @@ export const prerender = true;
       const button = document.createElement('button');
       button.className = 'copy-button';
       button.innerHTML = 'Copy';
+	  button.style.position = 'absolute';
+	  button.style.top = '10px';
+	  button.style.right = '10px';
+
       button.setAttribute('aria-label', 'Copy code to clipboard');
       
       // Add click handler
