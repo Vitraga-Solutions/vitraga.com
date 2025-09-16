@@ -34,6 +34,16 @@
     --dark: #191a23;
     --gray: #f3f3f3;
     --white: #ffffff;
+    
+    /* Code theme colors */
+    --code-background: #0a0a0a;
+    --code-foreground: #cacaca;
+    --code-muted: #6a737d;
+    --code-keyword: #ff6b6b;
+    --code-string: #4ecdc4;
+    --code-number: #95e1d3;
+    --code-property: #93bcff;
+    --code-class: #f9ca24;
   }
 
   /* @layer base {
@@ -164,17 +174,81 @@
   font-weight: bold;
 }
 
-/* Enhanced code block styling */
+/* Enhanced code block styling with dark theme */
 pre.astro-code {
   padding: 2rem;
   border-radius: 12px;
   position: relative;
-  background: #0f172a !important;
-  border: 1px solid #334155;
+  background: var(--code-background) !important;
+  border: 1px solid #1e1e1e;
   overflow-x: auto;
   font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
   font-size: 0.875rem;
   line-height: 1.6;
+}
+
+/* Dark theme color overrides */
+.astro-code {
+  background-color: var(--code-background) !important;
+  color: var(--code-foreground) !important;
+}
+
+/* Syntax highlighting color scheme matching your theme */
+.astro-code .token.comment,
+.astro-code .token.prolog,
+.astro-code .token.doctype,
+.astro-code .token.cdata {
+  color: var(--code-muted) !important;
+  font-style: italic;
+}
+
+.astro-code .token.keyword,
+.astro-code .token.function,
+.astro-code .token.tag {
+  color: var(--code-keyword) !important;
+  font-weight: 500;
+}
+
+.astro-code .token.string,
+.astro-code .token.attr-value {
+  color: var(--code-string) !important;
+}
+
+.astro-code .token.number,
+.astro-code .token.boolean,
+.astro-code .token.constant {
+  color: var(--code-number) !important;
+}
+
+.astro-code .token.variable,
+.astro-code .token.parameter {
+  color: var(--code-foreground) !important;
+}
+
+.astro-code .token.property,
+.astro-code .token.attr-name {
+  color: var(--code-property) !important;
+}
+
+.astro-code .token.operator,
+.astro-code .token.punctuation {
+  color: var(--code-foreground) !important;
+}
+
+.astro-code .token.class-name,
+.astro-code .token.builtin,
+.astro-code .token.regex {
+  color: var(--code-class) !important;
+}
+
+/* Additional token styling */
+.astro-code .token.selector {
+  color: var(--code-keyword) !important;
+}
+
+.astro-code .token.important {
+  color: var(--code-keyword) !important;
+  font-weight: bold;
 }
 
 .content pre {
