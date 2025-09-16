@@ -31,7 +31,7 @@ function formatReadTime(content: string) {
     <section class="py-16 px-4 bg-gradient-to-b from-gray to-white">
       <div class="max-w-6xl mx-auto text-center">
         <h1 class="text-5xl lg:text-6xl font-bold text-dark mb-6 font-grotesk">
-          Our <span class="greenhead">Blog</span>
+          Our <span class="greenhead">Blogs</span>
         </h1>
         <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
           Insights, tutorials, and thoughts on modern web development, AI, and technology trends
@@ -58,7 +58,7 @@ function formatReadTime(content: string) {
         ) : (
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogs.map((blog) => (
-              <Card isUnderline={true} rounded={'rounded-[25px]'}>
+              <Card isUnderline={true} rounded={'rounded-[20px]'}>
                 <a 
                   href={`/blogs/${blog.slug}`}
                   class="block h-full transition-transform duration-300 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2 rounded-[25px]"
