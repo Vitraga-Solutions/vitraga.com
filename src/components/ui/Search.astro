@@ -1,0 +1,263 @@
+---
+interface Props {
+  placeholder?: string;
+  searchType?: 'blogs' | 'general';
+  className?: string;
+}
+
+const { 
+  placeholder = 'Search...', 
+  searchType = 'general',
+  className = ''
+} = Astro.props;
+---
+
+<div class={`search-container ${className}`}>
+  <div class="relative">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+    </div>
+    <input
+      type="text"
+      id="search-input"
+      class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green focus:border-green transition-colors duration-200 text-dark placeholder-gray-500"
+      placeholder={placeholder}
+      data-search-type={searchType}
+    />
+    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+      <button
+        type="button"
+        id="clear-search"
+        class="text-gray-400 hover:text-gray-600 transition-colors duration-200 hidden"
+        title="Clear search"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Search Results Info -->
+  <div id="search-info" class="mt-4 hidden">
+    <p class="text-sm text-gray-600">
+      <span id="results-count">0</span> results found for "<span id="search-term"></span>"
+    </p>
+  </div>
+
+  <!-- No Results Message -->
+  <div id="no-results" class="mt-8 text-center py-8 hidden">
+    <div class="max-w-md mx-auto">
+      <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No results found</h3>
+      <p class="text-gray-600">Try adjusting your search terms or browse all posts below.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  class SearchHandler {
+    private searchInput: HTMLInputElement;
+    private clearButton: HTMLButtonElement;
+    private searchInfo: HTMLElement;
+    private noResults: HTMLElement;
+    private resultsCount: HTMLElement;
+    private searchTerm: HTMLElement;
+    private originalContent: HTMLElement | null = null;
+    private allItems: Element[] = [];
+    private searchType: string;
+
+    constructor() {
+      this.searchInput = document.getElementById('search-input') as HTMLInputElement;
+      this.clearButton = document.getElementById('clear-search') as HTMLButtonElement;
+      this.searchInfo = document.getElementById('search-info') as HTMLElement;
+      this.noResults = document.getElementById('no-results') as HTMLElement;
+      this.resultsCount = document.getElementById('results-count') as HTMLElement;
+      this.searchTerm = document.getElementById('search-term') as HTMLElement;
+      this.searchType = this.searchInput.dataset.searchType || 'general';
+
+      this.init();
+    }
+
+    private init() {
+      // Store original content and get all searchable items
+      this.storeOriginalContent();
+      
+      // Event listeners
+      this.searchInput.addEventListener('input', this.handleSearch.bind(this));
+      this.clearButton.addEventListener('click', this.clearSearch.bind(this));
+      
+      // Handle URL search params on page load
+      this.handleUrlParams();
+    }
+
+    private storeOriginalContent() {
+      if (this.searchType === 'blogs') {
+        const blogGrid = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3');
+        if (blogGrid) {
+          this.originalContent = blogGrid as HTMLElement;
+          this.allItems = Array.from(blogGrid.children);
+        }
+      }
+    }
+
+    private handleUrlParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchQuery = urlParams.get('search');
+      if (searchQuery) {
+        this.searchInput.value = searchQuery;
+        this.performSearch(searchQuery);
+      }
+    }
+
+    private handleSearch(event: Event) {
+      const query = (event.target as HTMLInputElement).value.trim();
+      
+      if (query.length === 0) {
+        this.clearSearch();
+        return;
+      }
+
+      this.showClearButton();
+      this.performSearch(query);
+      
+      // Update URL without page reload
+      const url = new URL(window.location.href);
+      if (query) {
+        url.searchParams.set('search', query);
+      } else {
+        url.searchParams.delete('search');
+      }
+      window.history.replaceState({}, '', url.toString());
+    }
+
+    private performSearch(query: string) {
+      if (this.searchType === 'blogs') {
+        this.searchBlogs(query);
+      }
+    }
+
+    private searchBlogs(query: string) {
+      const normalizedQuery = query.toLowerCase();
+      const matchingItems: Element[] = [];
+
+      this.allItems.forEach(item => {
+        const title = item.querySelector('h2')?.textContent?.toLowerCase() || '';
+        const excerpt = item.querySelector('p')?.textContent?.toLowerCase() || '';
+        const tags = Array.from(item.querySelectorAll('.bg-green')).map(tag => 
+          tag.textContent?.toLowerCase() || ''
+        ).join(' ');
+
+        const isMatch = title.includes(normalizedQuery) || 
+                       excerpt.includes(normalizedQuery) || 
+                       tags.includes(normalizedQuery);
+
+        if (isMatch) {
+          matchingItems.push(item);
+        }
+      });
+
+      this.displayResults(matchingItems, query);
+    }
+
+    private displayResults(items: Element[], query: string) {
+      if (!this.originalContent) return;
+
+      // Clear current content
+      this.originalContent.innerHTML = '';
+
+      if (items.length === 0) {
+        this.showNoResults();
+        this.hideSearchInfo();
+      } else {
+        // Add matching items
+        items.forEach(item => {
+          this.originalContent!.appendChild(item.cloneNode(true));
+        });
+        
+        this.showSearchInfo(items.length, query);
+        this.hideNoResults();
+      }
+    }
+
+    private showSearchInfo(count: number, query: string) {
+      this.resultsCount.textContent = count.toString();
+      this.searchTerm.textContent = query;
+      this.searchInfo.classList.remove('hidden');
+    }
+
+    private hideSearchInfo() {
+      this.searchInfo.classList.add('hidden');
+    }
+
+    private showNoResults() {
+      this.noResults.classList.remove('hidden');
+    }
+
+    private hideNoResults() {
+      this.noResults.classList.add('hidden');
+    }
+
+    private showClearButton() {
+      this.clearButton.classList.remove('hidden');
+    }
+
+    private hideClearButton() {
+      this.clearButton.classList.add('hidden');
+    }
+
+    private clearSearch() {
+      this.searchInput.value = '';
+      this.hideClearButton();
+      this.hideSearchInfo();
+      this.hideNoResults();
+      
+      // Restore original content
+      if (this.originalContent && this.allItems.length > 0) {
+        this.originalContent.innerHTML = '';
+        this.allItems.forEach(item => {
+          this.originalContent!.appendChild(item);
+        });
+      }
+
+      // Clear URL parameter
+      const url = new URL(window.location.href);
+      url.searchParams.delete('search');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }
+
+  // Initialize search when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    new SearchHandler();
+  });
+</script>
+
+<style>
+  .search-container {
+    @apply w-full max-w-2xl mx-auto;
+  }
+
+  #search-input:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  }
+
+  /* Hide clear button initially */
+  #clear-search.hidden {
+    display: none;
+  }
+
+  /* Search highlight animation */
+  @keyframes searchHighlight {
+    0% { background-color: rgba(34, 197, 94, 0.1); }
+    100% { background-color: transparent; }
+  }
+
+  .search-highlight {
+    animation: searchHighlight 1s ease-out;
+  }
+</style>
