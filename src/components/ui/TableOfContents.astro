@@ -1,0 +1,145 @@
+---
+export interface TocItem {
+  id: string;
+  text: string;
+  level: number;
+}
+
+export interface Props {
+  headings: TocItem[];
+  title?: string;
+}
+
+const { headings, title = "On this page" } = Astro.props;
+
+// Filter to show only h2 and h3 headings for better readability
+const filteredHeadings = headings.filter(heading => heading.level <= 3);
+---
+
+{filteredHeadings.length > 0 && (
+  <aside class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+    <h2 class="text-lg font-semibold text-dark mb-4 font-grotesk">
+      {title}
+    </h2>
+    <nav class="toc-nav">
+      <ul class="space-y-2 overflow-y-auto max-h-[280px]">
+        {filteredHeadings.map((heading) => (
+          <li class={`toc-item toc-level-${heading.level}`}>
+            <a 
+              href={`#${heading.id}`}
+              class={`block py-1 text-sm transition-colors duration-200 hover:text-green
+                ${heading.level === 2 
+                  ? 'text-dark font-medium border-l-2 border-transparent hover:border-green pl-3' 
+                  : 'text-gray-600 ml-6 pl-3 border-l border-gray-200 hover:border-green'
+                }`}
+              data-toc-link
+              data-heading-id={heading.id}
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </aside>
+)}
+
+<style>
+  .toc-container {
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+  }
+
+  .toc-nav a.active {
+    @apply text-green border-green font-medium;
+  }
+
+  /* Smooth scrolling for the entire page */
+  :global(html) {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar for TOC */
+  .toc-container::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .toc-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 2px;
+  }
+
+  .toc-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 2px;
+  }
+
+  .toc-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tocLinks = document.querySelectorAll('[data-toc-link]');
+    const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    
+    // Add smooth scrolling and active state management
+    tocLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('data-heading-id');
+        const target = document.getElementById(targetId);
+        
+        if (target) {
+          // Smooth scroll to target with offset for sticky header
+          const yOffset = -80;
+          const y = target.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          
+          window.scrollTo({
+            top: y,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
+    // Highlight active section in TOC based on scroll position
+    function highlightActiveSection() {
+      let activeHeading = null;
+      const scrollPosition = window.scrollY + 100; // Offset for better UX
+
+      headings.forEach(heading => {
+        if (heading.offsetTop <= scrollPosition) {
+          activeHeading = heading;
+        }
+      });
+
+      // Remove active class from all links
+      tocLinks.forEach(link => link.classList.remove('active'));
+
+      // Add active class to current section link
+      if (activeHeading && activeHeading.id) {
+        const activeLink = document.querySelector(`[data-heading-id="${activeHeading.id}"]`);
+        if (activeLink) {
+          activeLink.classList.add('active');
+        }
+      }
+    }
+
+    // Listen for scroll events
+    let isScrolling = false;
+    window.addEventListener('scroll', () => {
+      if (!isScrolling) {
+        window.requestAnimationFrame(() => {
+          highlightActiveSection();
+          isScrolling = false;
+        });
+        isScrolling = true;
+      }
+    });
+
+    // Initial highlight
+    highlightActiveSection();
+  });
+</script>
